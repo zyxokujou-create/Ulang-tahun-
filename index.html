@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>3D Thick Birthday Book</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Caveat:wght@600&family=Dancing+Script:wght@700&display=swap" rel="stylesheet">
+
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            background-color: #f7a8c4;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-family: 'Comic Sans MS', 'Segoe UI', sans-serif;
+            overflow: hidden;
+            perspective: 1200px;
+        }
+
+        /* KAMERA ANGLE */
+        .camera-viewport {
+            transform-style: preserve-3d;
+            transform: rotateX(20deg) rotateY(-25deg) scale(0.85);
+            transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+        }
+
+        /* CONTAINER BUKU */
+        .book {
+            position: relative;
+            width: 300px;
+            height: 420px;
+            transform-style: preserve-3d;
+            cursor: pointer;
+        }
+
+        /* LEMBARAN COVER TERMASUK SISI SAMPUL */
+        .cover-leaf {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            transform-origin: left;
+            transform-style: preserve-3d;
+            transition: transform 1.5s cubic-bezier(0.25, 1, 0.5, 1);
+            z-index: 2;
+        }
+
+        /* Sampul Luar (Depan) */
+        .cover-front {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            backface-visibility: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 
+                1px 1px 0px #e0e0e0,
+                2px 2px 0px #d5d5d5,
+                3px 3px 0px #ccc,
+                4px 4px 0px #bbb,
+                5px 5px 15px rgba(0,0,0,0.2);
+        }
+
+        .cover-front img {
+            max-width: 80%;
+            height: auto;
+            margin-bottom: 20px;
+        }
+
+        /* Sampul Dalam (Sisi Kiri saat Buku Terbuka) */
+        .cover-back {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            background-color: #fff;
+            transform: rotateY(180deg);
+            backface-visibility: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            text-align: center;
+            border-radius: 8px 0 0 8px;
+            box-shadow: inset -15px 0 20px rgba(0, 0, 0, 0.08);
+            border-right: 1px solid #e0e0e0;
+        }
+
+        /* HALAMAN ISI DENGAN EFEK TUMPULAN KERTAS TEBAL */
+        .details-page {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            padding: 25px 20px;
+            background-color: #fff;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: flex-start;
+            z-index: 1;
+            border-radius: 0 8px 8px 0;
+            box-shadow: 
+                inset 15px 0 20px rgba(0, 0, 0, 0.08),
+                1px 1px 0px #e6e6e6,
+                2px 2px 0px #e0e0e0,
+                3px 3px 0px #dadada,
+                4px 4px 0px #d4d4d4,
+                5px 5px 0px #cecece,
+                6px 6px 0px #c8c8c8,
+                7px 7px 0px #c2c2c2,
+                8px 8px 0px #bcbcbc,
+                9px 9px 0px #b6b6b6,
+                10px 10px 0px #b0b0b0,
+                15px 15px 30px rgba(0, 0, 0, 0.25);
+        }
+
+        /* KUSTOMISASI TULISAN TANGAN & KEMIRINGAN DIAGONAL SERAGAM */
+        .details-page h2 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.8rem;
+            color: #2b7a78;
+            margin-bottom: 2px;
+            transform: rotate(-3deg); /* Kemiringan sejajar */
+        }
+
+        .details-page h4 {
+            font-family: 'Dancing Script', cursive;
+            font-size: 1.4rem;
+            color: #2b7a78;
+            margin-bottom: 10px;
+            transform: rotate(-3deg); /* Kemiringan sejajar */
+        }
+
+        /* Semua baris teks miring diagonal dengan sudut yang sama (-3deg) */
+        .details-page p {
+            font-family: 'Caveat', cursive;
+            font-size: 1.15rem;
+            color: #333;
+            line-height: 1.25;
+            margin-bottom: 2px;
+            transform: rotate(-3deg); /* Semua baris miring diagonal seragam */
+            transform-origin: left center;
+        }
+
+        .details-page p.text-right {
+            align-self: flex-end;
+            margin-top: 8px;
+            font-weight: bold;
+            font-size: 1.3rem;
+            transform: rotate(-3deg); /* Nama pengirim juga miring sejajar */
+        }
+
+        /* --- ANGLE KAMERA SAAT TERBUKA --- */
+        .camera-viewport:hover {
+            transform: rotateX(10deg) rotateY(0deg) scale(1);
+        }
+
+        .camera-viewport:hover .cover-leaf {
+            transform: rotateY(-180deg);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="camera-viewport" id="bookContainer">
+        <div class="book">
+            
+            <div class="cover-leaf">
+                <div class="cover-front">
+                    <h3>HAPPY BIRTHDAY</h3>
+                    <img src="https://i.imgur.com/j04Qvfi.jpeg" alt="Foto Sampul">
+                </div>
+                <div class="cover-back">
+                    <p style="color: #888; font-style: italic; font-size: 0.9rem;">
+                        
+                    </p>
+                </div>
+            </div>
+
+            <div class="details-page">
+                <h2>HAPPY BIRTHDAY</h2>
+                <h4>SAYANGGG</h4>
+                <p>Selamat ulang tahun Sayanggkuuu,</p>
+                <p>hari ini adalah hari spesialmu.</p>
+                <p>Semoga kamu selalu diberikan kesehatan, kebahagiaan,</p>
+                <p>dan kemudahan dalam segala hal.</p>
+                <p>Terima kasih atas semua momen baik selama ini,</p>
+                <p>aku sangat bersyukur bisa memilikimu seutuhnya.</p>
+                <p>Xixixixi,selamatt yahhh ayangg.</p>
+                <p>Sekali lagi,</p>
+                <p>selamat ulang tahun untukmu!</p>
+                <p class="text-right">- Vinz</p>
+            </div>
+
+        </div>
+    </div>
+
+    <audio id="bgMusic" loop>
+        <source src="https://mp3tourl.com/audio/1788755463617-91ab3114-b004-4751-9fdb-0de1280150be.mp3" type="audio/mpeg">
+    </audio>
+
+    <script>
+        const bookContainer = document.getElementById('bookContainer');
+        const bgMusic = document.getElementById('bgMusic');
+
+        // Memutar lagu saat kursor masuk / disentuh (buku dibuka)
+        bookContainer.addEventListener('mouseenter', function() {
+            bgMusic.play();
+        });
+
+        // Hentikan/Pause lagu saat kursor keluar (buku ditutup kembali)
+        bookContainer.addEventListener('mouseleave', function() {
+            bgMusic.pause();
+        });
+    </script>
+
+</body>
+</html>
